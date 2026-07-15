@@ -1,5 +1,25 @@
 // Silas Wiesmann Eventtechnik — Site-Interaktionen
 
+// TODO: durch die echte Google Analytics 4 Measurement-ID ersetzen (Format "G-XXXXXXXXXX"),
+// sobald das GA4-Property in Google Analytics angelegt wurde.
+const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+
+function loadGoogleAnalytics() {
+  if (window.gaLoaded || !GA_MEASUREMENT_ID || GA_MEASUREMENT_ID.indexOf('XXXX') !== -1) return;
+  window.gaLoaded = true;
+
+  const script = document.createElement('script');
+  script.async = true;
+  script.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_MEASUREMENT_ID;
+  document.head.appendChild(script);
+
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { window.dataLayer.push(arguments); }
+  window.gtag = gtag;
+  gtag('js', new Date());
+  gtag('config', GA_MEASUREMENT_ID, { anonymize_ip: true });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -88,9 +108,8 @@ function initCookieConsent() {
   };
 
   const applyConsent = (consent) => {
-    // Platzhalter: hier würden z. B. Statistik-Skripte geladen,
-    // sobald consent.statistics === true ist.
     document.documentElement.dataset.statsConsent = consent.statistics ? 'true' : 'false';
+    if (consent.statistics) loadGoogleAnalytics();
   };
 
   const showBanner = () => {
